@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "MyJDownloader Click'n'Load",
+  "short_name": "MyJD CNL",
+  "description": "Fängt Click'n'Load-Anfragen (127.0.0.1:9666 / localhost:9666) ab und sendet sie über die MyJDownloader Cloud API an deine JDownloader-Geräte.",
+  "version": "1.0.1",
+  "author": "MyJD Click'n'Load",
+  "icons": {
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "webRequest",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": {
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "MyJDownloader Click'n'Load",
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "toolbar.html",
+        "images/*",
+        "res/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "contentscripts/toolbarContentscript.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false,
+      "exclude_matches": [
+        "*://*.challenges.cloudflare.com/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

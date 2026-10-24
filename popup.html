@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>MyJDownloader Click'n'Load</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="images/icon48.png" alt="MyJD">
+        <div>
+          <div class="brand-title">MyJDownloader CNL</div>
+          <div class="brand-subtitle" id="accountEmailText">Nicht verbunden</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="statusBadge" class="badge-pill badge-offline">Offline</span>
+        <button id="logoutBtn" class="btn btn-danger btn-sm hidden" title="Abmelden">Logout</button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs (shown when logged in) -->
+    <nav id="mainTabs" class="nav-tabs hidden">
+      <button class="nav-tab active" data-tab="tabDevices">Geräte &amp; CNL</button>
+      <button class="nav-tab" data-tab="tabSaved">Gespeichert (<span id="savedCountBadge">0</span>)</button>
+      <button class="nav-tab" data-tab="tabSettings">Einstellungen</button>
+    </nav>
+
+    <main class="content-body">
+      <div id="popupAlert" class="alert alert-error hidden"></div>
+      <div id="popupSuccess" class="alert alert-success hidden"></div>
+
+      <!-- Click'n'Load Master Switch Card -->
+      <div class="section-card">
+        <div class="toggle-row" style="padding:0;">
+          <div>
+            <div class="toggle-label" style="font-weight:600;">Click'n'Load Überwachung</div>
+            <div class="toggle-sub">Fängt 127.0.0.1:9666 &amp; localhost:9666 ab</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="cnlMasterToggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Login View -->
+      <div id="loginView" class="section-card">
+        <div class="section-title">Mit MyJDownloader verbinden</div>
+        <div class="form-group">
+          <label class="form-label" for="emailInput">MyJDownloader E-Mail</label>
+          <input type="email" id="emailInput" class="form-input" placeholder="deine@email.de">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">Passwort</label>
+          <input type="password" id="passwordInput" class="form-input" placeholder="••••••••">
+        </div>
+        <button id="connectBtn" class="btn btn-primary btn-block" style="margin-top:8px;">
+          Anmelden
+        </button>
+        <div style="margin-top:10px; text-align:center;">
+          <a href="https://my.jdownloader.org" target="_blank" style="color:#58a6ff; font-size:11.5px; text-decoration:none;">
+            MyJDownloader Konto erstellen / Webinterface &#8599;
+          </a>
+        </div>
+      </div>
+
+      <!-- Connected View: Tab 1 (Devices & Manual Add / CNL Test) -->
+      <div id="tabDevices" class="tab-pane hidden">
+        <div class="section-card">
+          <div class="section-title">
+            <span>Verbundene JDownloader</span>
+            <button id="reloadDevicesBtn" class="icon-btn" title="Neu laden">&#8635; Aktualisieren</button>
+          </div>
+          <div id="devicesListContainer"></div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Links direkt senden</div>
+          <div class="form-group">
+            <textarea id="manualLinksInput" class="form-textarea" rows="2" placeholder="Download-Links oder dummycnl:// hier einfügen..."></textarea>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="manualPackageInput" class="form-input" placeholder="Paketname (optional)" style="flex:1;">
+            <button id="sendManualLinksBtn" class="btn btn-success">Senden</button>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Click'n'Load Funktionstest</div>
+          <div style="font-size:11.5px; color:var(--jd-muted); margin-bottom:8px;">
+            Simuliert einen verschlüsselten Click'n'Load-Aufruf (<code>/flash/addcrypted2</code>) im aktiven Tab.
+          </div>
+          <button id="testCnlBtn" class="btn btn-secondary btn-block">
+            &#9889; Click'n'Load Test-Paket auslösen
+          </button>
+        </div>
+      </div>
+
+      <!-- Connected View: Tab 2 (Saved for Later) -->
+      <div id="tabSaved" class="tab-pane hidden">
+        <div class="section-card">
+          <div class="section-title">
+            <span>Gespeicherte CNL-Pakete &amp; Links</span>
+            <button id="clearSavedBtn" class="icon-btn" title="Alle löschen">Alle löschen</button>
+          </div>
+          <div id="savedListContainer"></div>
+          <div id="sendSavedFooter" class="hidden" style="margin-top:10px;">
+            <button id="sendAllSavedBtn" class="btn btn-success btn-block">
+              Alle gespeicherten Pakete an JDownloader senden
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connected View: Tab 3 (Settings) -->
+      <div id="tabSettings" class="tab-pane hidden">
+        <div class="section-card">
+          <div class="section-title">Click'n'Load Verhalten</div>
+
+          <div class="form-group">
+            <label class="form-label" for="prefDeviceSelect">Bevorzugter Ziel-JDownloader</label>
+            <select id="prefDeviceSelect" class="form-select"></select>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">In-Page Dialog bei Click'n'Load zeigen</div>
+              <div class="toggle-sub">Wenn aus: Sendet sofort im Hintergrund</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingShowDialog" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Auto-Send Countdown aktivieren</div>
+              <div class="toggle-sub">Sendet nach Ablauf automatisch</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="settingCountdownActive" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="form-group" style="margin-top:6px;">
+            <label class="form-label" for="settingCountdownSec">Countdown-Dauer (Sekunden)</label>
+            <input type="number" id="settingCountdownSec" class="form-input" min="1" max="30" value="3">
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="vendor/crypto-js/components/core.js"></script>
+  <script src="vendor/crypto-js/rollups/aes.js"></script>
+  <script src="scripts/popup.js"></script>
+</body>
+</html>

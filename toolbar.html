@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>MyJDownloader Click'n'Load</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="toolbar-iframe-body">
+  <div class="toolbar-card">
+    <header class="app-header">
+      <div class="brand">
+        <img src="images/icon48.png" alt="MyJD">
+        <div>
+          <div class="brand-title">Click'n'Load</div>
+          <div class="brand-subtitle" id="headerSubtitle">MyJDownloader Cloud</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="connectionBadge" class="badge-pill badge-online">Verbunden</span>
+        <button id="closeBtn" class="icon-btn" title="Schließen">&#10005;</button>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <div id="alertBox" class="alert alert-error hidden"></div>
+      <div id="successBox" class="alert alert-success hidden">
+        Erfolgreich an JDownloader gesendet!
+      </div>
+
+      <!-- Inline Login View (shown if not logged in when CNL triggers) -->
+      <div id="loginSection" class="section-card hidden">
+        <div class="section-title">MyJDownloader Anmeldung erforderlich</div>
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">E-Mail</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="deine@email.de">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPass">Passwort</label>
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button id="loginBtn" class="btn btn-primary btn-block">Anmelden</button>
+          <button id="saveOfflineBtn" class="btn btn-secondary" title="Ohne Login lokal zwischenspeichern">Später</button>
+        </div>
+      </div>
+
+      <!-- Countdown Banner -->
+      <div id="countdownBanner" class="countdown-banner hidden">
+        <span class="countdown-text">Automatisch senden in <strong id="countdownSeconds">3</strong>s...</span>
+        <button id="stopCountdownBtn" class="btn btn-secondary btn-sm">Stopp / Optionen</button>
+      </div>
+
+      <!-- Intercepted CNL Queue -->
+      <div class="section-card">
+        <div class="section-title">
+          <span>Abgefangene Pakete (<span id="queueCount">0</span>)</span>
+        </div>
+        <div id="queueList"></div>
+      </div>
+
+      <!-- Device & Options Section -->
+      <div id="sendConfigSection">
+        <div class="section-card">
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="form-label" for="deviceSelect" style="margin-bottom:0;">Ziel-JDownloader</label>
+              <button id="refreshDevicesBtn" class="icon-btn" title="Geräteliste aktualisieren">&#8635; Aktualisieren</button>
+            </div>
+            <select id="deviceSelect" class="form-select"></select>
+          </div>
+
+          <div style="margin-top:8px;">
+            <button id="toggleOptionsBtn" class="btn btn-secondary btn-sm btn-block">
+              &#9881; Optionale Parameter (Paketname, Passwort, Zielordner)
+            </button>
+          </div>
+
+          <div id="optionalFieldsPanel" class="hidden" style="margin-top:10px; padding-top:10px; border-top:1px solid var(--jd-border);">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="optPackageName">Paketname</label>
+                <input type="text" id="optPackageName" class="form-input" placeholder="Optionaler Paketname">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optSaveTo">Zielordner</label>
+                <input type="text" id="optSaveTo" class="form-input" placeholder="z.B. /downloads">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="optArchivePw">Archiv-Passwort</label>
+                <input type="text" id="optArchivePw" class="form-input" placeholder="Entpack-Passwort">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optDownloadPw">Download-Passwort</label>
+                <input type="text" id="optDownloadPw" class="form-input" placeholder="Hoster-Passwort">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="optComment">Kommentar</label>
+                <input type="text" id="optComment" class="form-input" placeholder="Kommentar">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="optPriority">Priorität</label>
+                <select id="optPriority" class="form-select">
+                  <option value="DEFAULT">Standard (Default)</option>
+                  <option value="HIGHEST">Höchste (Highest)</option>
+                  <option value="HIGHER">Höher (Higher)</option>
+                  <option value="HIGH">Hoch (High)</option>
+                  <option value="LOW">Niedrig (Low)</option>
+                  <option value="LOWER">Niedriger (Lower)</option>
+                  <option value="LOWEST">Niedrigste (Lowest)</option>
+                </select>
+              </div>
+            </div>
+            <div class="checkbox-grid">
+              <label class="checkbox-label">
+                <input type="checkbox" id="optAutoStart"> Autostart Downloads
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="optAutoExtract"> Auto-Entpacken
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="optDeepDecrypt"> Deep-Decrypt
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="optOverwritePackagizer"> Packagizer überschr.
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-actions" id="footerActions">
+      <button id="cancelBtn" class="btn btn-secondary">Abbrechen</button>
+      <button id="sendBtn" class="btn btn-success btn-block">An JDownloader senden</button>
+    </footer>
+  </div>
+
+  <script src="vendor/crypto-js/components/core.js"></script>
+  <script src="vendor/crypto-js/rollups/aes.js"></script>
+  <script src="scripts/toolbar.js"></script>
+</body>
+</html>
